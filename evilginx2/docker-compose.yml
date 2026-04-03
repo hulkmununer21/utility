@@ -1,0 +1,36 @@
+version: '3.8'
+
+services:
+  evilginx2:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "8080:8080"  # Web UI & API
+      - "443:443"    # HTTPS proxy
+      - "53:53/udp"  # DNS
+    volumes:
+      - ./phishlets:/app/phishlets
+      - ./redirectors:/app/redirectors
+      - evilginx_data:/root/.evilginx
+    environment:
+      - API_PASSWORD=ChangeMe123!
+      - PHISHLETS_DIR=/app/phishlets
+      - REDIRECTORS_DIR=/app/redirectors
+    command: >
+      ./evilginx2 
+      -p /app/phishlets 
+      -t /app/redirectors 
+      -c /root/.evilginx 
+      -api 
+      -api-addr 0.0.0.0:8080
+      -api-pwd ${API_PASSWORD}
+    networks:
+      - evilginx_net
+
+volumes:
+  evilginx_data:
+
+networks:
+  evilginx_net:
+    driver: bridge

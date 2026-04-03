@@ -1,0 +1,67 @@
+.sessions-page h2 {
+  color: #c9d1d9;
+  margin-bottom: 20px;
+  font-size: 24px;
+}
+
+.actions {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 20px;
+}
+
+.sessions-count {
+  color: #8b949e;
+  font-size: 14px;
+  margin-bottom: 15px;
+}
+
+.sessions-table {
+  width: 100%;
+  border-collapse: collapse;
+  background: #161b22;
+  border: 1px solid #30363d;
+  border-radius: 6px;
+  overflow: hidden;
+}
+
+.sessions-table thead {
+  background: #0d1117;
+  border-bottom: 1px solid #30363d;
+}
+
+.sessions-table th {
+  padding: 12px;
+  text-align: left;
+  color: #58a6ff;
+  font-weight: 600;
+  font-size: 14px;
+}
+
+.sessions-table td {
+  padding: 12px;
+  border-bottom: 1px solid #30363d;
+  font-size: 13px;
+}
+
+.sessions-table tbody tr:hover {
+  background: #0d1117;
+}
+
+.sessions-table tbody tr:last-child td {
+  border-bottom: none;
+}
+
+.url-cell {
+  max-width: 200px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  color: #79c0ff;
+}
+
+.btn-small {
+  padding: 4px 12px;
+  font-size: 12px;
+  border-radius: 4px;
+}

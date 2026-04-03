@@ -1,0 +1,65 @@
+.phishlets-page h2 {
+  color: #c9d1d9;
+  margin-bottom: 20px;
+  font-size: 24px;
+}
+
+.phishlets-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+  gap: 20px;
+  margin-top: 20px;
+}
+
+.phishlet-card {
+  background: #161b22;
+  border: 1px solid #30363d;
+  border-radius: 8px;
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+  transition: all 0.2s;
+}
+
+.phishlet-card:hover {
+  border-color: #58a6ff;
+  box-shadow: 0 0 10px rgba(88, 166, 255, 0.1);
+}
+
+.phishlet-card h3 {
+  color: #c9d1d9;
+  font-size: 18px;
+  margin: 0;
+}
+
+.phishlet-card .version {
+  color: #8b949e;
+  font-size: 12px;
+  margin: 0;
+}
+
+.phishlet-card button {
+  padding: 10px;
+  border-radius: 6px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.status {
+  text-align: center;
+  font-size: 12px;
+  font-weight: 600;
+  padding: 8px;
+  border-radius: 4px;
+}
+
+.status.enabled {
+  background: rgba(35, 134, 54, 0.2);
+  color: #3fb950;
+}
+
+.status.disabled {
+  background: rgba(248, 81, 73, 0.2);
+  color: #f85149;
+}

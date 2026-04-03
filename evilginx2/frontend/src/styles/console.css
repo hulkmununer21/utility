@@ -1,0 +1,69 @@
+.console-page h2 {
+  color: #c9d1d9;
+  margin-bottom: 20px;
+  font-size: 24px;
+}
+
+.console-output {
+  background: #0d1117;
+  border: 1px solid #30363d;
+  border-radius: 6px;
+  padding: 15px;
+  height: 400px;
+  overflow-y: auto;
+  font-family: 'Courier New', monospace;
+  font-size: 12px;
+  margin-bottom: 15px;
+}
+
+.console-line {
+  margin-bottom: 8px;
+  display: flex;
+  gap: 10px;
+}
+
+.console-line.command {
+  color: #79c0ff;
+}
+
+.console-line.result {
+  color: #79f0ba;
+  white-space: pre-wrap;
+  word-wrap: break-word;
+}
+
+.console-line.error {
+  color: #f85149;
+}
+
+.timestamp {
+  color: #6e7681;
+  min-width: 50px;
+}
+
+.console-placeholder {
+  text-align: center;
+  color: #6e7681;
+  padding: 50px 20px;
+}
+
+.console-input {
+  display: flex;
+  gap: 10px;
+}
+
+.console-input input {
+  flex: 1;
+  padding: 10px;
+  background: #0d1117;
+  border: 1px solid #30363d;
+  border-radius: 6px;
+  color: #c9d1d9;
+  font-family: 'Courier New', monospace;
+  font-size: 12px;
+}
+
+.console-input input:focus {
+  outline: none;
+  border-color: #58a6ff;
+}

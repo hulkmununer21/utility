@@ -1,0 +1,63 @@
+.config-page h2 {
+  color: #c9d1d9;
+  margin-bottom: 20px;
+  font-size: 24px;
+}
+
+.config-table {
+  width: 100%;
+  border-collapse: collapse;
+  background: #161b22;
+  border: 1px solid #30363d;
+  border-radius: 6px;
+  overflow: hidden;
+  margin-top: 20px;
+}
+
+.config-table thead {
+  background: #0d1117;
+  border-bottom: 1px solid #30363d;
+}
+
+.config-table th {
+  padding: 12px;
+  text-align: left;
+  color: #58a6ff;
+  font-weight: 600;
+  font-size: 14px;
+}
+
+.config-table td {
+  padding: 12px;
+  border-bottom: 1px solid #30363d;
+  font-size: 13px;
+}
+
+.config-table td.key {
+  color: #79c0ff;
+  font-weight: 500;
+  width: 30%;
+}
+
+.config-table td.value {
+  width: 50%;
+}
+
+.config-table td.value input {
+  width: 100%;
+  padding: 6px;
+  background: #0d1117;
+  border: 1px solid #58a6ff;
+  border-radius: 4px;
+  color: #c9d1d9;
+}
+
+.config-table td.action {
+  width: 20%;
+  display: flex;
+  gap: 8px;
+}
+
+.config-table tbody tr:hover {
+  background: #0d1117;
+}
